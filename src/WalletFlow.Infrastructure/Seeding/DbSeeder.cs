@@ -56,7 +56,7 @@ public static class DbSeeder
             var password = config[passwordKey];
             if (string.IsNullOrWhiteSpace(password))
             {
-                logger.LogWarning("Skipping seed user {Email}: no password is configured for it", email);
+                logger.LogWarning("Skipping the {Role} seed user: no password is configured for it", role);
                 return null;
             }
 
