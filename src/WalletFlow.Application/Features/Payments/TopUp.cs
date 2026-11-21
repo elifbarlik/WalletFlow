@@ -10,6 +10,7 @@ using WalletFlow.Domain.Transactions;
 
 namespace WalletFlow.Application.Features.Payments;
 
+/// <summary>Adds money to an account through the external payment provider.</summary>
 /// <param name="SourceToken">Opaque, provider-issued payment-method token. Card numbers are never handled here.</param>
 public sealed record TopUpCommand(
     Guid AccountId,

@@ -6,6 +6,7 @@ namespace Notification.Worker;
 /// <summary>Transport-independent handling of one event: dedupe through the inbox, then "send" the notification.</summary>
 internal sealed class NotificationProcessor(IInbox inbox, ILogger<NotificationProcessor> logger)
 {
+    /// <summary>Handles one event: skips duplicates, otherwise sends the notification.</summary>
     /// <returns>True when the notification was sent, false when the message was a duplicate.</returns>
     public async Task<bool> ProcessAsync(string? messageId, string? type, ReadOnlyMemory<byte> body)
     {

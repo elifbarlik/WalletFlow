@@ -89,7 +89,7 @@ public sealed class AuthorizationTests(ApiFactory factory)
             [new System.Security.Claims.Claim("sub", Guid.NewGuid().ToString()), new System.Security.Claims.Claim("role", "Admin")],
             expires: DateTime.UtcNow.AddMinutes(5),
             signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(key, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256)));
-        var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/admin/audit-logs");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/admin/audit-logs");
         request.Headers.Authorization = new("Bearer", token);
 
         (await _http.SendAsync(request)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);

@@ -25,7 +25,7 @@ public sealed class AuthTests(ApiFactory factory)
     [Fact]
     public async Task ProtectedEndpoint_WithGarbageToken_Returns401()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/accounts");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/accounts");
         request.Headers.Authorization = new("Bearer", "not.a.jwt");
 
         (await _http.SendAsync(request)).StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -101,7 +101,7 @@ public sealed class AuthTests(ApiFactory factory)
     [Fact]
     public async Task Responses_CarrySecurityHeaders_AndEchoSafeCorrelationIds()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "/health/live");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/health/live");
         request.Headers.Add("X-Correlation-Id", "trace-abc-12345678");
         var response = await _http.SendAsync(request);
 
@@ -110,7 +110,7 @@ public sealed class AuthTests(ApiFactory factory)
         response.Headers.GetValues("X-Frame-Options").Single().Should().Be("DENY");
         response.Headers.Contains("Server").Should().BeFalse();
 
-        var hostile = new HttpRequestMessage(HttpMethod.Get, "/health/live");
+        using var hostile = new HttpRequestMessage(HttpMethod.Get, "/health/live");
         hostile.Headers.Add("X-Correlation-Id", "bad id with spaces");
         (await _http.SendAsync(hostile)).Headers.GetValues("X-Correlation-Id").Single().Should().NotContain(" ");
     }
