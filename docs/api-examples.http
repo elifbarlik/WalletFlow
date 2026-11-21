@@ -1,0 +1,81 @@
+### WalletFlow API examples (VS Code REST Client / JetBrains HTTP client)
+@host = http://localhost:8080
+@v = api/v1
+
+### Register a customer
+POST {{host}}/{{v}}/auth/register
+Content-Type: application/json
+
+{ "email": "alice@example.test", "password": "CorrectHorse123" }
+
+### Login -> copy accessToken / refreshToken into the variables below
+POST {{host}}/{{v}}/auth/login
+Content-Type: application/json
+
+{ "email": "alice@example.test", "password": "CorrectHorse123" }
+
+@token = <paste accessToken>
+@refresh = <paste refreshToken>
+
+### Rotate the refresh token (the old one stops working)
+POST {{host}}/{{v}}/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refresh}}" }
+
+### Open a wallet
+POST {{host}}/{{v}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "currency": "TRY" }
+
+@account = <paste account id>
+@other = <paste another account id>
+
+### Top up through the payment provider (retry-safe thanks to Idempotency-Key)
+POST {{host}}/{{v}}/accounts/{{account}}/topups
+Authorization: Bearer {{token}}
+Idempotency-Key: topup-0001-abcdef
+Content-Type: application/json
+
+{ "amount": 250.00, "sourceToken": "tok_visa" }
+
+### Simulate a declined card -> 402 problem+json, balance unchanged
+POST {{host}}/{{v}}/accounts/{{account}}/topups
+Authorization: Bearer {{token}}
+Idempotency-Key: topup-0002-abcdef
+Content-Type: application/json
+
+{ "amount": 10.00, "sourceToken": "tok_declined" }
+
+### Transfer. Send it twice: the second call replays the first response, money moves once.
+POST {{host}}/{{v}}/transfers
+Authorization: Bearer {{token}}
+Idempotency-Key: transfer-0001-abcdef
+Content-Type: application/json
+
+{ "fromAccountId": "{{account}}", "toAccountId": "{{other}}", "amount": 40.50, "reference": "rent" }
+
+### Same key, different amount -> 422 idempotency.key_reused
+POST {{host}}/{{v}}/transfers
+Authorization: Bearer {{token}}
+Idempotency-Key: transfer-0001-abcdef
+Content-Type: application/json
+
+{ "fromAccountId": "{{account}}", "toAccountId": "{{other}}", "amount": 99.00, "reference": "rent" }
+
+### Transaction history (paged)
+GET {{host}}/{{v}}/accounts/{{account}}/transactions?page=1&size=20
+Authorization: Bearer {{token}}
+
+### Admin: freeze an account (needs an Admin token)
+PATCH {{host}}/{{v}}/admin/accounts/{{account}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "status": "Frozen" }
+
+### Admin/Auditor: audit trail
+GET {{host}}/{{v}}/admin/audit-logs?page=1&size=50
+Authorization: Bearer {{token}}
