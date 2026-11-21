@@ -42,9 +42,9 @@ public sealed class TestUser(HttpClient http, string email, TokensDto tokens)
         return new TestUser(http, email, (await response.Content.ReadFromJsonAsync<TokensDto>(Json))!);
     }
 
-    public Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, object? body = null, string? idempotencyKey = null, bool anonymous = false)
+    public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, object? body = null, string? idempotencyKey = null, bool anonymous = false)
     {
-        var request = new HttpRequestMessage(method, url);
+        using var request = new HttpRequestMessage(method, url);
         if (!anonymous)
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.AccessToken);
@@ -60,7 +60,7 @@ public sealed class TestUser(HttpClient http, string email, TokensDto tokens)
             request.Content = JsonContent.Create(body, options: Json);
         }
 
-        return http.SendAsync(request);
+        return await http.SendAsync(request);
     }
 
     public Task<HttpResponseMessage> GetAsync(string url) => SendAsync(HttpMethod.Get, url);

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 
 namespace Notification.Worker;
 
@@ -47,7 +48,7 @@ internal sealed class NotificationConsumer(IOptions<RabbitMqSettings> options, N
             {
                 connection = factory.CreateConnection("walletflow-notification-worker");
             }
-            catch (Exception ex)
+            catch (BrokerUnreachableException ex)
             {
                 logger.LogWarning("RabbitMQ not reachable yet ({Reason}); retrying", ex.GetType().Name);
                 await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken);

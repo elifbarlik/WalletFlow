@@ -48,6 +48,7 @@ public sealed record PaymentResult(bool Approved, string? ProviderReference, str
 
 public interface IPaymentGateway
 {
+    /// <summary>Charges the customer's payment method at the external provider.</summary>
     /// <exception cref="Common.ExternalServiceException">The provider is unreachable or failing.</exception>
     Task<PaymentResult> ChargeAsync(PaymentRequest request, CancellationToken ct);
 }
