@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -72,7 +72,7 @@ jobs:
           - { name: payment-simulator, file: src/PaymentProvider.Simulator/Dockerfile }
           - { name: notification-worker, file: src/Notification.Worker/Dockerfile }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: docker/setup-buildx-action@v3
       - name: Build ${{ matrix.name }} image (no push)
         uses: docker/build-push-action@v6
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Create throw-away secrets
         run: bash scripts/init-env.sh
       - name: Start stack and wait until healthy
