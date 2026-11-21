@@ -73,7 +73,7 @@ jobs:
           - { name: notification-worker, file: src/Notification.Worker/Dockerfile }
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build ${{ matrix.name }} image (no push)
         uses: docker/build-push-action@v6
         with:
